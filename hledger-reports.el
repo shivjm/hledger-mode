@@ -317,14 +317,14 @@ non-nil, it lands us in the `hledger-mode' ."
                                     (point-max)
                                     'next-error))
 
-(defun hledger-get-accounts (&optional string buffer)
-  "Return list of account names with STRING infix present.
-STRING can be multiple words separated by a space."
+(defun hledger-get-list (command &optional query buffer extra-args)
+  "Run hledger `command', passing the optional `query', and return
+the lines as a list. Return `nil' in case of errors."
   (let* ((dest-buffer (make-temp-name "hledger-output-"))
-         (constant-args (list "-I" "-f" (if buffer "-" hledger-jfile) "accounts"))
-         (full-args (if (null string)
+         (constant-args (append (list "-I" "-f" (if buffer "-" hledger-jfile) command) extra-args))
+         (full-args (if (null query)
                         constant-args
-                      (append constant-args (list string))))
+                      (append constant-args (list query))))
          (exit-code (if buffer
                         (with-current-buffer buffer
                           (apply #'call-process-region nil nil "hledger" nil dest-buffer nil full-args))
@@ -334,6 +334,16 @@ STRING can be multiple words separated by a space."
     (kill-buffer dest-buffer)
     (when (= exit-code 0)
       (split-string output "\n"))))
+
+(defun hledger-get-accounts (&optional query buffer)
+  "Return list of account names optionally filtered by `query'.
+Return `nil' in case of errors."
+  (hledger-get-list "accounts" query buffer))
+
+(defun hledger-get-payees (&optional query buffer)
+  "Return list of payee names optionally filtered by `query'.
+Return `nil' in case of errors."
+  (hledger-get-list "payees" query buffer))
 
 (defun hledger-get-balances (accounts)
   "Return balances for the sequence of ACCOUNTS."

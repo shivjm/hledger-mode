@@ -341,36 +341,43 @@ looks ugly when it's small."
 
 (defun hledger-update-accounts (&optional buffer)
   "Update `hledger-accounts-cache' (optionally using `buffer' as
-input) and unset `hledger-must-update-accounts'. Will do nothing
+input) and unset `hledger-must-update-cache'. Will do nothing
 if `buffer' is passed but inactive."
   (when (or (null buffer)
             (eql (current-buffer) buffer))
     (setq hledger-accounts-cache (hledger-get-accounts nil buffer)
-          hledger-must-update-accounts nil)))
+          hledger-must-update-cache nil)))
 
 (defun hledger-maybe-update-accounts (&optional buffer)
-  "Set the `hledger-must-update-accounts' flag to `t' if the current
+  "Set the `hledger-must-update-cache' flag to `t' if the current
 command inserts text."
   (when (eql this-command 'self-insert-command)
-    (hledger-must-update-accounts)))
+    (hledger-must-update-cache)))
 
-(defun hledger-must-update-accounts ()
-  "Set the `hledger-must-update-accounts' flag to `t'."
-  (setq hledger-must-update-accounts t))
+(defun hledger-must-update-cache ()
+  "Set the `hledger-must-update-cache' flag to `t'."
+  (setq hledger-must-update-cache t))
 
 (defun hledger-completion-at-point ()
   "Provide completion for accounts."
   (interactive)
-  (when hledger-must-update-accounts
+  (when hledger-must-update-cache
     (hledger-update-accounts (current-buffer)))
-  (let ((bounds
-         (or (bounds-of-thing-at-point 'hledger-account)
-             (bounds-of-thing-at-point 'symbol))))
-    (when bounds
-      (list (car bounds)
-            (cdr bounds)
-            hledger-accounts-cache
-            :exclusive 'no))))
+  (let ((pos (point)))
+    (cond
+     ((looking-back (concat "^" hledger-date-regex "\\(?: ([^)]*)\\)? \\([^;|]+\\)") (point-at-bol))
+      (list (match-beginning 1)
+            (match-end 1)
+            (hledger-get-payees (match-string-no-properties 1) (current-buffer))
+            :exclusive 'no))
+     (t (let ((bounds
+               (or (bounds-of-thing-at-point 'hledger-account)
+                   (bounds-of-thing-at-point 'symbol))))
+          (when bounds
+            (list (car bounds)
+                  (cdr bounds)
+                  hledger-accounts-cache
+                  :exclusive 'no)))))))
 
 
 (provide 'hledger-defuns)

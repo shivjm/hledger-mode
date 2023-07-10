@@ -73,7 +73,7 @@ a flag for the next time completions are requested."
 (defvar hledger-accounts-cache nil
   "List of accounts cached for ac and company modes.")
 
-(defvar hledger-must-update-accounts nil
+(defvar hledger-must-update-cache nil
   "Flag indicating that the list of accounts has potentially changed
 and must be recomputed. For internal use.")
 
