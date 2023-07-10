@@ -207,3 +207,26 @@ on-edit)',saving should not update the accounts cache."
         (set-buffer-modified-p nil)
         (kill-buffer buf)
         (ignore-errors (delete-file file-name))))))
+
+(defconst hledger-completion-should-work-input
+  "account revenues:client
+account expenses:biller
+account expenses:biller 2
+
+2023-07-10 Biller 2 | Transaction
+  bank:undeclared  -$5
+  expenses:biller 2
+
+2023-07-10 (#123) Undeclared Client | Transaction 2
+  bank:undeclared 2  $10
+  revenues:undeclared client")
+
+(ert-deftest hledger-completion-should-work ()
+  (with-temp-buffer
+    (insert hledger-completion-should-work-input)
+    (goto-char (point-min))
+    (let (hledger-accounts-cache)
+      (hledger-update-accounts (current-buffer))
+      (search-forward "expe")
+      (should (equal (hledger-completion-at-point)
+                     '(33 41 ("bank:undeclared" "bank:undeclared 2" "expenses:biller" "expenses:biller 2" "revenues:client" "revenues:undeclared client") :exclusive no))))))
