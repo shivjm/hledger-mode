@@ -214,10 +214,10 @@ account expenses:biller
 account expenses:biller 2
 
 2023-07-10 Biller 2 | Transaction
-  bank:undeclared  -$5
+  bank:undeclared  -$5  ; date:7/11
   expenses:biller 2
 
-2023-07-10 (#123) Undeclared Client | Transaction 2
+2023-07-10 (#123) Undeclared Client | Transaction 2  ; via:Client 3, include:yes
   bank:undeclared 2  $10
   revenues:undeclared client")
 
@@ -230,10 +230,14 @@ account expenses:biller 2
       (search-forward "Trans")
       (should (equal (hledger-completion-at-point)
                      '(98 103 ("Transaction" "Transaction 2") :exclusive no)))
+      (end-of-line)
+      (insert "  ;")
+      (should (equal (hledger-completion-at-point)
+                     '(112 112 ("date" "include" "via") :exclusive no)))
       (search-forward "  expenses:biller 2")
       (should (equal (hledger-completion-at-point)
-                     '(135 143 ("bank:undeclared" "bank:undeclared 2" "expenses:biller" "expenses:biller 2" "revenues:client" "revenues:undeclared client") :exclusive no)))
+                     '(151 168 ("bank:undeclared" "bank:undeclared 2" "expenses:biller" "expenses:biller 2" "revenues:client" "revenues:undeclared client") :exclusive no)))
       (search-forward "(#123) U")
       (should (equal (hledger-completion-at-point)
-                     '(172 173 ("Biller 2" "Undeclared Client")
+                     '(188 189 ("Biller 2" "Undeclared Client")
                            :exclusive no))))))

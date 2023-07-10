@@ -345,6 +345,11 @@ Return `nil' in case of errors."
 Return `nil' in case of errors."
   (hledger-get-list "payees" query buffer))
 
+(defun hledger-get-tags (&optional query buffer)
+  "Return list of tags optionally filtered by `query'.
+Return `nil' in case of errors."
+  (hledger-get-list "tags" query buffer))
+
 (defun hledger-get-descriptions (&optional query buffer)
   "Return list of descriptions optionally filtered by `query'.
 Return `nil' in case of errors."
