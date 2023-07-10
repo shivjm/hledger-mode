@@ -350,6 +350,12 @@ Return `nil' in case of errors."
 Return `nil' in case of errors."
   (hledger-get-list "tags" query buffer))
 
+(defun hledger-get-tag-values (tag-regexp &optional buffer)
+  "Return list of values for tags matching `tag-regexp' as understood by hledger.
+Return `nil' in case of errors. Cannot filter based on partial
+value."
+  (hledger-get-list "tag" tag-regexp buffer '("--values")))
+
 (defun hledger-get-descriptions (&optional query buffer)
   "Return list of descriptions optionally filtered by `query'.
 Return `nil' in case of errors."

@@ -213,7 +213,7 @@ on-edit)',saving should not update the accounts cache."
 account expenses:biller
 account expenses:biller 2
 
-2023-07-10 Biller 2 | Transaction
+2023-07-10 Biller 2 | Transaction  ; include:no
   bank:undeclared  -$5  ; date:7/11
   expenses:biller 2
 
@@ -230,14 +230,18 @@ account expenses:biller 2
       (search-forward "Trans")
       (should (equal (hledger-completion-at-point)
                      '(98 103 ("Transaction" "Transaction 2") :exclusive no)))
+      (search-forward "biller 2")
+      (should (equal (hledger-completion-at-point)
+                     '(162 179 ("bank:undeclared" "bank:undeclared 2" "expenses:biller" "expenses:biller 2" "revenues:client" "revenues:undeclared client") :exclusive no)))
       (end-of-line)
       (insert "  ;")
       (should (equal (hledger-completion-at-point)
-                     '(112 112 ("date" "include" "via") :exclusive no)))
-      (search-forward "  expenses:biller 2")
-      (should (equal (hledger-completion-at-point)
-                     '(151 168 ("bank:undeclared" "bank:undeclared 2" "expenses:biller" "expenses:biller 2" "revenues:client" "revenues:undeclared client") :exclusive no)))
+                     '(182 182 ("date" "include" "via") :exclusive no)))
       (search-forward "(#123) U")
       (should (equal (hledger-completion-at-point)
-                     '(188 189 ("Biller 2" "Undeclared Client")
-                           :exclusive no))))))
+                     '(202 203 ("Biller 2" "Undeclared Client")
+                           :exclusive no)))
+      (search-forward "$10")
+      (insert "  ; include:")
+      (should (equal (hledger-completion-at-point)
+                     '(301 301 ("no" "yes") :exclusive no))))))
