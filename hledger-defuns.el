@@ -365,6 +365,11 @@ command inserts text."
     (hledger-update-accounts (current-buffer)))
   (let ((pos (point)))
     (cond
+     ((looking-back (concat "^" hledger-date-regex "\\(?: ([^)]*)\\)? \\(?:[^;|]+\\) | \\([^;]+\\)") (point-at-bol))
+      (list (match-beginning 1)
+            (match-end 1)
+            (hledger-get-descriptions (concat "desc:" (match-string-no-properties 1)) (current-buffer))
+            :exclusive 'no))
      ((looking-back (concat "^" hledger-date-regex "\\(?: ([^)]*)\\)? \\([^;|]+\\)") (point-at-bol))
       (list (match-beginning 1)
             (match-end 1)

@@ -345,6 +345,14 @@ Return `nil' in case of errors."
 Return `nil' in case of errors."
   (hledger-get-list "payees" query buffer))
 
+(defun hledger-get-descriptions (&optional query buffer)
+  "Return list of descriptions optionally filtered by `query'.
+Return `nil' in case of errors."
+  (let ((full-descriptions
+         (hledger-get-list "descriptions" query buffer)))
+    ;; The descriptions returned by hledger include the payee.
+    (mapcar (lambda (d) (string-trim-left d ".*| ")) full-descriptions)))
+
 (defun hledger-get-balances (accounts)
   "Return balances for the sequence of ACCOUNTS."
   (with-current-buffer (hledger-jdo (mapconcat 'identity
